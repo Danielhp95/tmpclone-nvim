@@ -1,3 +1,5 @@
+local Path = require('plenary.path')
+
 local M = {}
 
 M.tmpDir = vim.fn.stdpath("data") .. "/tmpclone-dir"
