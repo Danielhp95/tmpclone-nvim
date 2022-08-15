@@ -1,0 +1,65 @@
+============================================================================
+----------------------------------------------------------------------------
+                                                                    *tmpclone*
+
+A small tool to help you temporarily clone repositories to navigate in nvim.
+
+Motivation: Navigating code via Github or derivatives is annoying, most developers whom
+use nvim will surely have a local workflow for navigating code which is superior to
+browser based methods.
+
+This plugin gives the following functionality:
+  1. Clone repos into a temporary data folder
+  2. Navigate those repositories with all nvim tooling
+  3. Remove cloned repos when they are no longer needed.
+
+  Work in Progress:
+  4. Seemlessly switch between "local" files and cloned repositories by
+  managing switching the working directory under the hood.
+
+============================================================================
+USAGE                                                         *tmpclone-usage*
+
+
+Call the setup function to activate: `require("tmpclone").setup({opts})`
+
+`{opts}` is a table with the following possible values:
+  - `datadir`: defaults to `vim.fn.stdpath('data')`
+
+This plugin presents 3 high level functions:                  *tmpclone.clone*
+
+         Vim: `:TmpcloneClone {url}`
+         Lua: `require("tmpclone.core").clone({url})`
+
+Clones git repository pointed to by `{url}` into internal temporary folder.
+Technically, any `{url}` accepted  by the standard `git clone` command can be
+passed. The cloned repository can be accessed via `TmpcloneOpen`.
+
+                                                          *tmpclone.open_repo*
+
+         Vim: `TmpcloneOpen {cloned_repo}?`
+         Lua: `require("tmpclone.core").open_repo({cloned_repo}?)`
+
+Opens previously cloned `{cloned_repo}` (optional parameter) in a new tab. If
+no parameter is passed, then Telescope will be launched to select amongst
+cloned repos.
+
+                                                        *tmpclone.remove_repo*
+
+         Vim: `TmpcloneRemove {cloned_repo}?`
+         Lua: `require("tmpclone.core").remove_repo({cloned_repo}?)`
+
+Removes previously cloned `{cloned_repo}` (optional parameter) from the
+temporary data folder. If no parameter is passed, then Telescope will be
+launched to select amongst cloned repos.
+
+
+KEYMAPS
+
+Suggested keymaps:
+
+`nnoremap <leader>tc :TmpcloneClone<cr>   # Or :lua require("tmpclone.core").clone()<cr>`
+`nnoremap <leader>to :TmpcloneOpen<cr>    # Or :lua require("tmpclone.core").open_repo()<cr>`
+`nnoremap <leader>tr :TmpcloneRemove<cr>  # Or :lua require("tmpclone.core").remove_repo()<cr>`
+
+ vim:tw=78:ts=8:noet:ft=help:norl:
