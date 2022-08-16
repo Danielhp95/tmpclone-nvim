@@ -39,7 +39,7 @@ end
 
 Tmpclone.setup = function(opts)
   opts = opts or {}  -- Ensures that if nothing is passed, we have an empty set
-  util.datadir = opts.datadir or vim.fn.stdpath('data')
+  util.datadir = opts.datadir or vim.fn.stdpath('data') .. '/tmpclone-data'
   Tmpclone.datadir = util.datadir
 
   setup_commands()

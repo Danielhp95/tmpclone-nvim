@@ -2,7 +2,7 @@ local Scandir = require('plenary.scandir')
 
 local M = {}
 
-M.datadir = vim.fn.stdpath("data") .. "/tmpclone-data"
+M.datadir = nil  -- To be populated in setup function
 
 M.get_cloned_repos = function ()
   -- Finds all cloned repositories
@@ -34,7 +34,6 @@ M.vimscript_command_completion = function()
 end
 
 M.buffer_path_in_any_cloned_dir = function (buf_path, cloned_dirs)
-  -- TODO: potentially remove
   for _, cloned_dir in ipairs(cloned_dirs) do
     if string.match(cloned_dir, buf_path) then return true end
   end
