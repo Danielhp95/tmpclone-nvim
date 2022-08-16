@@ -31,7 +31,7 @@ Defaults and options are presented here:
 
 ```lua
 require("tmpclone").setup({
-  datadir = vim.fn.stdpath('data')
+  datadir = vim.fn.stdpath('data') .. '/tmpclone-data'
 })
 ```
 
