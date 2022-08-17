@@ -23,6 +23,7 @@ Install with your favorite Neovim package manager, here is and example using
 ```lua
 use {'danielhp95/tmpclone-nvim',
      requires = {'nvim-lua/plenary.nvim', 'nvim-telescope/telescope.nvim'},
+    }
 ```
 
 Be sure to call `require("tmpclone").setup` function before using `tmpclone`.
