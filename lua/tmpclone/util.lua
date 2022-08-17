@@ -4,12 +4,12 @@ local M = {}
 
 M.datadir = nil  -- To be populated in setup function
 
+-- Finds all cloned repositories under tmpclone.datadir
 M.get_cloned_repos = function ()
-  -- Finds all cloned repositories
   return Scandir.scan_dir(M.datadir, {only_dirs = true, depth=1})
 end
 
-
+-- Whether :repo: name is already present in tmpcloned repos
 M.is_contained_in_repos = function(repo)
   for _, cloned_repo in ipairs(M.get_cloned_repos()) do
     if M.get_repo_name_from_absolute_path(cloned_repo) == repo then
@@ -19,25 +19,22 @@ M.is_contained_in_repos = function(repo)
   return false
 end
 
+-- Returns last value from :arg: path
 M.get_repo_name_from_absolute_path = function (path)
-  -- Returns last value from :arg: path
   local split_path = vim.split(path, "/")
   return split_path[#split_path]
 end
 
-M.vimscript_command_completion = function()
+-- Completion function for user commands
+-- For info on custom complete :command-complete
+M.vimscript_command_completion = function(argLead, cmdLine, cusorPos)
   local completions = {}
   for _, repo in ipairs(M.get_cloned_repos()) do
-    table.insert(completions, M.get_repo_name_from_absolute_path(repo))
+    if string.match(repo, argLead) then
+      table.insert(completions, M.get_repo_name_from_absolute_path(repo))
+    end
   end
   return completions
-end
-
-M.buffer_path_in_any_cloned_dir = function (buf_path, cloned_dirs)
-  for _, cloned_dir in ipairs(cloned_dirs) do
-    if string.match(cloned_dir, buf_path) then return true end
-  end
-  return false
 end
 
 local escape_lua_pattern = function(s)
@@ -60,9 +57,9 @@ local escape_lua_pattern = function(s)
     return (s:gsub(".", matches))
 end
 
+-- Tries to match the root directory of :arg: buf_path against all paths
+-- in :cloned_dirs:
 M.match_root_dir_of_current_path = function (buf_path, cloned_dirs)
-  -- Tries to match the root directory of :arg: buf_path against all paths
-  -- in :arg: cloned_dirs
   for _, cloned_dir in ipairs(cloned_dirs) do
     if string.match(buf_path, escape_lua_pattern(M.get_repo_name_from_absolute_path(cloned_dir))) then
       return cloned_dir
@@ -71,6 +68,8 @@ M.match_root_dir_of_current_path = function (buf_path, cloned_dirs)
   return nil
 end
 
+-- WORK IN PROGRESS
+-- The logic that magically switches between working directories
 M.change_working_directory_for_tmpclone_directories = function ()
   -- 1. if buff not in clone_paths and curr_wd not in path:
   -- 1. nothing
@@ -83,7 +82,6 @@ M.change_working_directory_for_tmpclone_directories = function ()
 
   local cwd = vim.fn.getcwd()
   local buffer_path = vim.fn.expand('%')
-
 
   local buffer_matching_tmp_root_dir = M.match_root_dir_of_current_path(buffer_path, M.get_cloned_repos())
   local cwd_matching_tmp_root_dir = M.match_root_dir_of_current_path(cwd, M.get_cloned_repos())

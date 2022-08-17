@@ -7,8 +7,8 @@ local util = require "tmpclone.util"
 
 local M = {}
 
+-- Entry maker for telescope picker
 function M.cloned_repo_entry_maker(entry)
-  -- Entry maker for telescope picker
   return {
     value = entry,
     path = entry[1],
@@ -17,8 +17,12 @@ function M.cloned_repo_entry_maker(entry)
   }
 end
 
+-- Telescope picker used to open or remove tmpclone repos
+-- :title: is used for prompt title and :on_success_fn:
+-- Is used after a selection is made
 function M.open_or_remove_picker(title, on_success_fn)
-  opts = {} -- TODO
+  -- TODO: figure out a way of passing user defined options
+  opts = {}
   pickers.new(opts, {
     prompt_title = title,
     attach_mappings = function(prompt_bufnr, _)
@@ -29,9 +33,10 @@ function M.open_or_remove_picker(title, on_success_fn)
       return true
     end,
     finder = finders.new_table {
-      results = M.preprocess_cloned_repo_paths(),
+      results = M.generate_telescope_results(),
       entry_maker = M.cloned_repo_entry_maker,
-      -- Previewer not working
+      -- TODO: Previewer not working. Might be because one cannot preview files
+      -- outside of root directory? (Read this somewhere...)
       previewer = require("telescope.previewers").new_termopen_previewer({
         get_command = function(entry, _)
           return { 'bat', action_state.get_selected_entry().path .. "/README.md" }
@@ -42,9 +47,8 @@ function M.open_or_remove_picker(title, on_success_fn)
   }):find()
 end
 
--- TODO: rename
-M.preprocess_cloned_repo_paths = function ()
-  -- Creates an array containing entries of {absolute_path_to_repo, repo_name}
+-- Creates an array containing entries of {absolute_path_to_repo, repo_name}
+M.generate_telescope_results = function ()
   local repos = util.get_cloned_repos()
   local entries = {}
   for _, repo in ipairs(repos) do

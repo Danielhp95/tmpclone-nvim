@@ -3,14 +3,15 @@ local util = require('tmpclone.util')
 
 local Tmpclone  = {}
 
+-- Ensures that tmpclone datadir exists
 Tmpclone.init_tmp_dir = function()
--- Ensures that datadir exists
   local tmp_repos_dir_path = Path:new(Tmpclone.datadir)
   if not tmp_repos_dir_path:exists() then
     tmp_repos_dir_path:mkdir()
   end
 end
 
+-- Setup user commands
 local setup_commands = function()
   local cmd = vim.api.nvim_create_user_command
 
@@ -25,9 +26,10 @@ local setup_commands = function()
   cmd("TmpcloneClone", function(argtable) require("tmpclone.core").clone(argtable.args) end, {nargs = 1}) -- Exactly 1 argument
 end
 
+-- NOT YET IMPLEMENTED
+-- Manages swapping the working directory under the hood when swapping from
+-- directories cloned by tmpclone and other files
 local setup_aucommands = function()
-  -- To manage swapping working directories under the hood
-  -- TODO: add an options flag to disable this
   vim.api.nvim_create_autocmd(
     "BufEnter", {
       group = vim.api.nvim_create_augroup("tmpclone", {}),
@@ -37,13 +39,21 @@ local setup_aucommands = function()
   )
 end
 
+-- Highest level plugin function.
+-- opts:
+--   - datadir (string): Directory where tmpclone repositories will live
+--   - auto_change_dir (boolean): NOT YET IMPLEMENTED. Whether to activate the
+--                                auto swapping of working directories
 Tmpclone.setup = function(opts)
   opts = opts or {}  -- Ensures that if nothing is passed, we have an empty set
   util.datadir = opts.datadir or vim.fn.stdpath('data') .. '/tmpclone-data'
-  Tmpclone.datadir = util.datadir
+  Tmpclone.datadir = util.datadir  -- Maybe not a good idea that we save this in 2 places
+  Tmpclone.opts = opts  -- Save options on highest level module if
+
+  local auto_change_dir = opts.auto_change_dir or false
 
   setup_commands()
-  -- setup_aucommands() Work In Progress
+  if auto_change_dir then setup_aucommands() end
 
   Tmpclone.init_tmp_dir()
 end

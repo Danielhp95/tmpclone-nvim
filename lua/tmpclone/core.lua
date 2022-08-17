@@ -5,11 +5,13 @@ local telescope_util = require("tmpclone.telescope_util")
 
 local M = {}
 
+-- NOT YET IMPLEMENTED
 M.working_dir_stack = {}
 
+-- Clones git repository pointed to by :repo_url: into internal temporary folder.
+-- Technically, any :url: accepted  by the standard `git clone` command can be
+-- passed. The cloned repository can be accessed via user command `TmpcloneOpen`.
 M.clone = function (repo_url)
-  -- Clones {repo_url} into temporary directory
-  -- It can be searched using listRepos
   require"os".execute("git -C " .. util.datadir .. " clone " .. repo_url .. " > /dev/null 2>&1") -- Redirecting stdout and stderr to not mess with my nvim setup
 
   local tmp_repos_dir_path = Path:new(util.datadir .. "/" .. util.get_repo_name_from_absolute_path(repo_url))
@@ -20,10 +22,10 @@ M.clone = function (repo_url)
   end
 end
 
--- Lists all cloned repos for selection as to which to open
+-- Opens previously cloned :repo: (optional parameter) in a new tab.
+-- If no parameter is passed, then Telescope will be launched to select amongst
+-- cloned repos.
 M.open_repo = function (repo)
-  -- scans data directory and presents all of the directories' readme in telescope picker
-
   if repo ~= "" and not util.is_contained_in_repos(repo) then
     print("Repository " .. repo .. " could not be found")
     return
@@ -41,11 +43,10 @@ M.open_repo = function (repo)
   end
 end
 
-
--- Removes repo_name
+-- Removes previously cloned :repo: (optional parameter) from the
+-- temporary data folder. If no parameter is passed, then Telescope will be
+-- launched to select amongst cloned repos.
 M.remove_repo = function (repo)
-  -- Matches repo_name against cloned directories And removes them
-
   if repo ~= "" and not util.is_contained_in_repos(repo) then
     print("Repository " .. repo .. " could not be found")
     return
